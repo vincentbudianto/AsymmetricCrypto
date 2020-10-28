@@ -25,11 +25,19 @@ class RSAKeygen(object):
         if (not num.isPrime(p)):
             p = 0
         else:
-            self.p = p
+            if (p > 256):
+                p = 0
+                print("P must be <= 256")
+            else:
+                self.p = p
         if (not num.isPrime(q)):
             q = 0
         else:
-            self.q = q
+            if (q > 256):
+                q = 0
+                print("Q must be <= 256")
+            else:
+                self.q = q
 
         # Find two random primes
         candidate = 0
