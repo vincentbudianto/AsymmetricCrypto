@@ -1,7 +1,10 @@
-from backend import *
+from backend.diffHell import DiffHell
+from backend.elgamal import Elgamal
+from backend import diffHell, elgamal, RSA
+from backend.util import file, num
 from PyQt5 import QtCore, QtGui, QtWidgets
+from PyQt5.QtWidgets import QMessageBox
 
-import mimetypes
 import os
 import sys
 import subprocess
@@ -163,9 +166,9 @@ class Ui_MainWindow(object):
         self.label_15 = QtWidgets.QLabel(self.verticalLayoutWidget)
         self.label_15.setObjectName("label_15")
         self.verticalLayout_12.addWidget(self.label_15)
-        self.rsa_g = QtWidgets.QLineEdit(self.verticalLayoutWidget)
-        self.rsa_g.setObjectName("rsa_g")
-        self.verticalLayout_12.addWidget(self.rsa_g)
+        self.rsa_q = QtWidgets.QLineEdit(self.verticalLayoutWidget)
+        self.rsa_q.setObjectName("rsa_q")
+        self.verticalLayout_12.addWidget(self.rsa_q)
         self.label_16 = QtWidgets.QLabel(self.verticalLayoutWidget)
         self.label_16.setObjectName("label_16")
         self.verticalLayout_12.addWidget(self.label_16)
@@ -295,6 +298,19 @@ class Ui_MainWindow(object):
         self.retranslateUi(MainWindow)
         QtCore.QMetaObject.connectSlotsByName(MainWindow)
 
+        self.browse_publickey.clicked.connect(lambda x: self.browse("filename_publickey"))
+        self.browse_privatekey.clicked.connect(lambda x: self.browse("filename_privatekey"))
+        self.browse_ciphertext.clicked.connect(lambda x: self.browse("filename_ciphertext"))
+        self.browse_plaintext.clicked.connect(lambda x: self.browse("filename_plaintext"))
+        self.rsa_encrypt.clicked.connect(self.RSAEncrypt)
+        self.rsa_decrypt.clicked.connect(self.RSADecrypt)
+        self.elgamal_encrypt.clicked.connect(self.ElgamalEncrypt)
+        self.elgamal_decrypt.clicked.connect(self.ElgamalDecrypt)
+        self.rsa_generate.clicked.connect(self.GenerateRSA)
+        self.elgamal_generate.clicked.connect(self.GenerateElgamal)
+        self.diffie_helman_generate_X.clicked.connect(self.DiffHellmanX)
+        self.diffie_helman_generate_agreed_key.clicked.connect(self.DiffHellmanKey)
+
     def retranslateUi(self, MainWindow):
         _translate = QtCore.QCoreApplication.translate
         MainWindow.setWindowTitle(_translate("MainWindow", "Asymmetric Crypto"))
@@ -315,7 +331,7 @@ class Ui_MainWindow(object):
         self.label_8.setText(_translate("MainWindow", "Key-Generator"))
         self.label_9.setText(_translate("MainWindow", "Key Filename"))
         self.label_11.setText(_translate("MainWindow", "p (default = 0, must be <= 256)"))
-        self.label_15.setText(_translate("MainWindow", "g (default = 0, must be <= 256)"))
+        self.label_15.setText(_translate("MainWindow", "q (default = 0, must be <= 256)"))
         self.label_16.setText(_translate("MainWindow", "e (default = 0)"))
         self.rsa_generate.setText(_translate("MainWindow", "Generate RSA Key"))
         self.label_12.setText(_translate("MainWindow", "p (must be >= 256 and <= 65536)"))
@@ -332,53 +348,269 @@ class Ui_MainWindow(object):
         self.diffie_helman_generate_agreed_key.setText(_translate("MainWindow", "Generate Agreed Key"))
         self.label_22.setText(_translate("MainWindow", "Agreed Key"))
 
-    def open_plaintext_file(self):
-        print(self.plaintext_file_name)
-        if self.plaintext_file_name != "":
-            try:
-                if sys.platform == "win32":
-                    os.startfile(self.plaintext_file_name)
-                else:
-                    opener ="open" if sys.platform == "darwin" else "xdg-open"
-                    subprocess.call([opener, self.plaintext_file_name])
-            except:
-                print("Plaintext file is not found")
+    def createErrorMsg(self, message):
+        msg = QMessageBox()
+        msg.setIcon(QMessageBox.Critical)
+        msg.setText(message)
+        msg.setInformativeText('More information')
+        msg.setWindowTitle("Error")
+        msg.exec_()
 
-    def open_ciphertext_file(self):
-        print(self.ciphertext_file_name)
-        if self.ciphertext_file_name != "":
-            try:
-                if sys.platform == "win32":
-                    os.startfile(self.ciphertext_file_name)
-                else:
-                    opener ="open" if sys.platform == "darwin" else "xdg-open"
-                    subprocess.call([opener, self.ciphertext_file_name])
-            except:
-                print("Ciphertext file is not found")
+    def browse(self, target):
+        if (target == "filename_publickey"):
+            inputFileName, _ = QtWidgets.QFileDialog.getOpenFileName(
+                None,
+                "Select Input File",
+                "",
+                "Public Key File (*.pub)",
+            )
+        elif (target == "filename_privatekey"):
+            inputFileName, _ = QtWidgets.QFileDialog.getOpenFileName(
+                None,
+                "Select Input File",
+                "",
+                "Private Key File (*.pri)",
+            )
+        else:
+            inputFileName, _ = QtWidgets.QFileDialog.getOpenFileName(
+                None,
+                "Select Input File",
+                "",
+                "All Files (*)",
+            )
+        if inputFileName:
+            if (target == "filename_publickey"):
+                self.filename_publickey.insert(inputFileName)
+            elif (target == "filename_privatekey"):
+                self.filename_privatekey.insert(inputFileName)
+            elif (target == "filename_ciphertext"):
+                self.filename_ciphertext.insert(inputFileName)
+            elif (target == "filename_plaintext"):
+                self.filename_plaintext.insert(inputFileName)
+            else:
+                print("Error when writing input file")
+                self.createErrorMsg("Error when writing input file!")
+                return -1
+        else:
+            print("Cancelled / Error when reading input file")
+            return -1
 
-    def open_publickey_file(self):
-        print(self.publickey_file_name)
-        if self.publickey_file_name != "":
-            try:
-                if sys.platform == "win32":
-                    os.startfile(self.publickey_file_name)
-                else:
-                    opener ="open" if sys.platform == "darwin" else "xdg-open"
-                    subprocess.call([opener, self.publickey_file_name])
-            except:
-                print("Public key file is not found")
+    def RSAEncrypt(self):
+        pubKeyPath = self.filename_publickey.text()
+        if (pubKeyPath != ""):
+            pubKey = file.readFromJson(pubKeyPath)
+            plainFile = self.filename_plaintext.text()
+            plainText = self.plaintext.toPlainText()
+            cipherText = self.ciphertext
+            if (plainFile != ""):
+                array = file.readFile(plainFile)
+                encrypted = RSA.encrypt(array, pubKey["e"], pubKey["n"])
 
-    def open_privatekey_file(self):
-        print(self.privatekey_file_name)
-        if self.privatekey_file_name != "":
-            try:
-                if sys.platform == "win32":
-                    os.startfile(self.privatekey_file_name)
+                # Set Path
+                path, _ = QtWidgets.QFileDialog.getSaveFileName(
+                    None,
+                    "Select Input File",
+                    plainFile,
+                    "All Files (*)",
+                )
+                file.writeFile(path=path, arr=encrypted)
+            elif (plainText != ""):
+                # array = bytearray(plainText.encode("ascii"))
+                # array = list(array)
+                cText = RSA.encryptText(plainText, pubKey["e"], pubKey["n"])
+                # encrypted = bytearray(encrypted)
+                # cText = encrypted.decode("ascii")
+                cipherText.setPlainText(cText)
+            else:
+                self.createErrorMsg("Plaintext Empty!")
+                return -1
+        else:
+            self.createErrorMsg("Public Key empty!")
+            return -1
+
+    def RSADecrypt(self):
+        priKeyPath = self.filename_privatekey.text()
+        if (priKeyPath != ""):
+            priKey = file.readFromJson(priKeyPath)
+            cipherFile = self.filename_ciphertext.text()
+            plainText = self.plaintext
+            cipherText = self.ciphertext.toPlainText()
+            if (cipherFile != ""):
+                array = file.readFile(cipherFile)
+                decrypted = RSA.decrypt(array, priKey["d"], priKey["n"])
+
+                # Set Path
+                path, _ = QtWidgets.QFileDialog.getSaveFileName(
+                    None,
+                    "Select Input File",
+                    cipherFile,
+                    "All Files (*)",
+                )
+                file.writeFile(path=path, arr=decrypted)
+            elif (cipherText != ""):
+                # array = bytearray(cipherText.encode("ascii"))
+                # array = list(array)
+                pText = RSA.decryptText(cipherText, priKey["d"], priKey["n"])
+                # decrypted = bytearray(decrypted)
+                # pText = decrypted.decode("ascii")
+                plainText.setPlainText(pText)
+            else:
+                self.createErrorMsg("Ciphertext Empty!")
+                return -1
+        else:
+            self.createErrorMsg("Private Key empty!")
+            return -1
+
+    def ElgamalEncrypt(self):
+        pubKeyPath = self.filename_publickey.text()
+
+        if (pubKeyPath != ""):
+            pubKey = file.readFromJson(pubKeyPath)
+            plainFile = self.filename_plaintext.text()
+            plainText = self.plaintext.toPlainText()
+            cipherText = self.ciphertext
+
+            if (plainFile != ""):
+                array = file.readFile(plainFile)
+                el = Elgamal(pubKey["p"], pubKey["g"], (pubKey["p"] - 2))
+                el.setPublicKey(pubKey["y"], pubKey["g"], pubKey["p"])
+                encrypted = el.encrypt(array)
+
+                # Set Path
+                path, _ = QtWidgets.QFileDialog.getSaveFileName(
+                    None,
+                    "Select Input File",
+                    plainFile,
+                    "All Files (*)",
+                )
+                file.writeFile(path=path, arr=encrypted)
+            elif (plainText != ""):
+                # array = bytearray(plainText.encode("ascii"))
+                # array = list(array)
+                el = Elgamal(pubKey["p"], pubKey["g"], (pubKey["p"] - 2))
+                el.setPublicKey(pubKey["y"], pubKey["g"], pubKey["p"])
+                cText = el.encryptText(plainText)
+                # encrypted = bytearray(encrypted)
+                # cText = encrypted.decode("ascii")
+                cipherText.setPlainText(cText)
+            else:
+                self.createErrorMsg("Plaintext Empty!")
+                return -1
+        else:
+            self.createErrorMsg("Public Key empty!")
+            return -1
+
+    def ElgamalDecrypt(self):
+        priKeyPath = self.filename_privatekey.text()
+        if (priKeyPath != ""):
+            priKey = file.readFromJson(priKeyPath)
+            cipherFile = self.filename_ciphertext.text()
+            plainText = self.plaintext
+            cipherText = self.ciphertext.toPlainText()
+            if (cipherFile != ""):
+                array = file.readFile(cipherFile)
+                el = Elgamal(priKey["p"], (priKey["p"] - 1), priKey["x"])
+                el.setPrivateKey(priKey["x"], priKey["p"])
+                decrypted = el.decrypt(array)
+
+                # Set Path
+                path, _ = QtWidgets.QFileDialog.getSaveFileName(
+                    None,
+                    "Select Input File",
+                    cipherFile,
+                    "All Files (*)",
+                )
+                file.writeFile(path=path, arr=decrypted)
+            elif (cipherText != ""):
+                # array = bytearray(cipherText.encode("ascii"))
+                # array = list(array)
+                el = Elgamal(priKey["p"], (priKey["p"] - 1), priKey["x"])
+                el.setPrivateKey(priKey["x"], priKey["p"])
+                pText = el.decryptText(cipherText)
+                # decrypted = bytearray(decrypted)
+                # pText = decrypted.decode("ascii")
+                plainText.setPlainText(pText)
+            else:
+                self.createErrorMsg("Plaintext Empty!")
+                return -1
+        else:
+            self.createErrorMsg("Public Key empty!")
+            return -1
+        pass
+
+    def GenerateRSA(self):
+        self.save_key_result_file_path = self.filename_key_2.text()
+        if (self.save_key_result_file_path != ""):
+            p = int(self.rsa_p.text())
+            e = int(self.rsa_e.text())
+            q = int(self.rsa_q.text())
+
+            key = RSA.RSAKeygen(p = p, q = q, e = e)
+            key.writeToFile(self.save_key_result_file_path)
+        else:
+            self.createErrorMsg("Target save filename is empty!")
+            return -1
+        pass
+
+    def GenerateElgamal(self):
+        self.save_key_result_file_path = self.filename_key_2.text()
+        if (self.save_key_result_file_path != ""):
+            p = int(self.elgamal_p.text())
+            g = int(self.elgamal_g.text())
+            x = int(self.elgamal_x.text())
+
+            key = Elgamal(p, g, x)
+            key.writeToFile(self.save_key_result_file_path)
+        else:
+            self.createErrorMsg("Target save filename is empty!")
+            return -1
+        pass
+
+    def DiffHellmanX(self):
+        x = int(self.diffie_helman_x.text())
+        n = int(self.diffie_helman_n.text())
+        g = int(self.diffie_helman_g.text())
+        if (x != ""):
+            if (n != ""):
+                if (g != ""):
+                    res = DiffHell(x, n, g)
+                    self.diffie_helman_X.setPlainText(str(res.send()))
                 else:
-                    opener ="open" if sys.platform == "darwin" else "xdg-open"
-                    subprocess.call([opener, self.privatekey_file_name])
-            except:
-                print("Private key file is not found")
+                    self.createErrorMsg("g empty!")
+                    return -1
+            else:
+                self.createErrorMsg("n empty!")
+                return -1
+        else:
+            self.createErrorMsg("x empty!")
+            return -1
+        pass
+
+    def DiffHellmanKey(self):
+        x = int(self.diffie_helman_x.text())
+        n = int(self.diffie_helman_n.text())
+        g = int(self.diffie_helman_g.text())
+        y = int(self.diffie_helman_Y.text())
+        if (x != ""):
+            if (n != ""):
+                if (g != ""):
+                    if (y != ""):
+                        res = DiffHell(x, n, g)
+                        res.exchange(y)
+                        self.diffie_helman_agreed_key.setPlainText(str(res.agreedKey()))
+                    else:
+                        self.createErrorMsg("Y empty!")
+                        return -1
+                else:
+                    self.createErrorMsg("g empty!")
+                    return -1
+            else:
+                self.createErrorMsg("n empty!")
+                return -1
+        else:
+            self.createErrorMsg("x empty!")
+            return -1
+        pass
 
 if __name__ == "__main__":
     app = QtWidgets.QApplication(sys.argv)

@@ -323,12 +323,12 @@
             <item>
              <widget class="QLabel" name="label_15">
               <property name="text">
-               <string>g (default = 0, must be &lt;= 256)</string>
+               <string>q (default = 0, must be &lt;= 256)</string>
               </property>
              </widget>
             </item>
             <item>
-             <widget class="QLineEdit" name="rsa_g"/>
+             <widget class="QLineEdit" name="rsa_q"/>
             </item>
             <item>
              <widget class="QLabel" name="label_16">

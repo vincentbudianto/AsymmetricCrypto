@@ -1,6 +1,6 @@
 import math
 import random
-import util.num as num
+import backend.util.num as num
 import json
 
 class RSAKeygen(object):
@@ -115,7 +115,7 @@ class RSAKeygen(object):
         with open(str(filename) + ".pub", "w") as outfile:
             outfile.write(pubJson)
 
-def encrypt(data, e, n) -> []:
+def encrypt(data, e, n):
     """ Encrypts data.
     Output size is doubled.
     Little Endian.
@@ -132,7 +132,7 @@ def encrypt(data, e, n) -> []:
             c = c // 256
     return out
 
-def decrypt(data, d, n) -> []:
+def decrypt(data, d, n):
     """ Decrypts data.
     Output size is halved.
     Little Endian.
@@ -146,3 +146,46 @@ def decrypt(data, d, n) -> []:
         p = int(pow(c, d) % n)
         out.append(p)
     return out
+
+def decryptText(text, d, n):
+    """ Decrypts Text.
+    Output size is 1/3.
+    Little Endian.
+
+    Keyword Arguments:
+    text -- string
+    """
+    text = str(text)
+    data = bytearray(text.encode("ascii"))
+    data = list(data)
+    out = []
+    for i in range(0, len(data), 3):
+        c = (data[i] - 32) + ((data[i+1]-32) * 95) + ((data[i+2]-32) * 95 * 95)
+        p = int(pow(c, d) % n)
+        out.append(p)
+    out = bytearray(out)
+    outText = out.decode("ascii")
+    return outText
+
+def encryptText(text, e, n):
+    """ Encrypts text.
+    Output size is tripled.
+    Little Endian.
+
+    Keyword Arguments:
+    text -- string
+    """
+    text = str(text)
+    data = bytearray(text.encode("ascii"))
+    data = list(data)
+    out = []
+    for p in data:
+        c = int(pow(p, e) % n)
+        for i in range(0,3):
+            cPart = c % 95
+            cPart += 32
+            out.append(cPart)
+            c = c // 95
+    out = bytearray(out)
+    outText = out.decode("ascii")
+    return outText

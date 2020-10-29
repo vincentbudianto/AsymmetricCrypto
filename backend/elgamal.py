@@ -1,6 +1,6 @@
 import random
 import json
-import util.num as num
+import backend.util.num as num
 
 class Elgamal:
     """
@@ -78,7 +78,7 @@ class Elgamal:
         with open(str(filename) + ".pub", "w") as outfile:
             outfile.write(pubJson)
 
-    def encrypt(self, data) -> []:
+    def encrypt(self, data):
         """ Parameter Input.
 
         Keyword Arguments:
@@ -97,18 +97,88 @@ class Elgamal:
             k = random.randint(1, (self.p - 2))
 
             a = (self.g ** k) % self.p
+            a1 = a % 256
+            a2 = (a // 256) % 256
             b = ((self.y ** k) * m) % self.p
+            b1 = b % 256
+            b2 = (b // 256) % 256
 
-            out.append([a, b])
+            out.append(a1)
+            out.append(a2)
+            out.append(b1)
+            out.append(b2)
 
         return out
 
-    def decrypt(self, data) -> []:
+    def decrypt(self, data):
         out = []
 
-        for a, b in data:
-            temp = (a ** (self.p - 1 - self.x)) % self.p
-            m = (b * temp) % self.p
+        newData = []
+        for i in range(0, len(data), 2):
+            newData.append(data[i] + (data[i + 1] * 256))
+        data = newData
+
+        for i in range(0, len(data), 2):
+            temp = (data[i] ** (self.p - 1 - self.x)) % self.p
+            m = (data[i+1] * temp) % self.p
             out.append(m)
 
         return out
+
+    def encryptText(self, text):
+        """ Parameter Input.
+
+        Keyword Arguments:
+        m -- Random Number (must be inputted and fulfills condition 0 <= m <= p - 1)
+        k -- Random Number (must be inputted and fulfills condition 1 <= k <= p - 2)
+        """
+        text = str(text)
+        data = bytearray(text.encode("ascii"))
+        data = list(data)
+        out = []
+
+        for m in data:
+            if (m < 0):
+                raise Exception('m must be >= 0')
+
+            if (m > (self.p - 1)):
+                raise Exception('m must be <= (p - 1)')
+
+            k = random.randint(1, (self.p - 2))
+
+            a = (self.g ** k) % self.p
+            b = ((self.y ** k) * m) % self.p
+
+            out.append(a)
+            out.append(b)
+
+        #Out array post-processing
+        outText = []
+        for i in range(0, len(out)):
+            outText.append((out[i] % 95) +  32)
+            outText.append(((out[i] // 95) % 95) +  32)
+
+        outText = bytearray(outText)
+        outText = outText.decode("ascii")
+        return outText
+
+    def decryptText(self, text):
+        text = str(text)
+        data = bytearray(text.encode("ascii"))
+        data = list(data)
+        out = []
+
+        # Data pre-processing
+        newData = []
+        for i in range(0, len(data), 2):
+            newData.append(((data[i+1]-32) * 95) + (data[i]-32))
+        data = newData
+
+        for i in range(0, len(data), 2):
+            temp = (data[i] ** (self.p - 1 - self.x)) % self.p
+            m = (data[i+1] * temp) % self.p
+            out.append(m)
+
+        outText = bytearray(out)
+        outText = outText.decode("ascii")
+        return outText
