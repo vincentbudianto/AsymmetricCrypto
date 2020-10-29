@@ -71,7 +71,7 @@ class RSAKeygen(object):
                 raise Exception('e')
 
         # Finds d, where d is a whole number and d = (1 + k * totN) / e and k is whole number
-        print("finding d...")
+        # print("finding d...")
         d = 0.9
         k = 1
         while (((1 + (k * self.totN)) % self.e) != 0):
