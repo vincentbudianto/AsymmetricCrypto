@@ -16,11 +16,13 @@ print('y :', y3)
 print('g :', g3)
 print('p :', p3)
 
-a, b = bob.encrypt(m = 2035, k = 1520)
-print('Encryption :')
-print('a :', a)
-print('b :', b)
+m = [0, 1, 2, 255]
+# m = [2035]
 
-m = alice.decrypt(a = a, b = b)
+encrypted = bob.encrypt(data = m)
+print('Encryption :')
+print(encrypted)
+
+decrypted = alice.decrypt(data = encrypted)
 print('Decryption :')
-print('m :', m)
+print(decrypted)

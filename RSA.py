@@ -69,7 +69,7 @@ class RSAKeygen(object):
                 self.e = e
             else:
                 raise Exception('e')
-        
+
         # Finds d, where d is a whole number and d = (1 + k * totN) / e and k is whole number
         print("finding d...")
         d = 0.9
@@ -105,16 +105,16 @@ class RSAKeygen(object):
             "n" : self.n
         }
 
-        # Serializing json  
-        pubJson = json.dumps(pubDict, indent = 4) 
-        priJson = json.dumps(priDict, indent = 4) 
+        # Serializing json
+        pubJson = json.dumps(pubDict, indent = 4)
+        priJson = json.dumps(priDict, indent = 4)
 
         # Write to file
         with open(str(filename) + ".pri", "w") as outfile:
             outfile.write(priJson)
         with open(str(filename) + ".pub", "w") as outfile:
-            outfile.write(pubJson) 
-    
+            outfile.write(pubJson)
+
 def encrypt(data, e, n) -> []:
     """ Encrypts data.
     Output size is doubled.
