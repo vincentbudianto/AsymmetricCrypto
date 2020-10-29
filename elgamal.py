@@ -10,7 +10,7 @@ class Elgamal:
         """ Parameter Input.
 
         Keyword Arguments:
-        p -- Prime Number (must be inputted)
+        p -- Prime Number (must be inputted and fulfills condition 256 <= p <= 65536)
         g -- Random Number (must be inputted and less than p)
         x -- Random Number (must be inputted and fulfills condition 1 <= x <= p - 2)
         """
