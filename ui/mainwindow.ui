@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <ui version="4.0">
- <class>Dialog</class>
- <widget class="QDialog" name="Dialog">
+ <class>MainWindow</class>
+ <widget class="QDialog" name="MainWindow">
   <property name="geometry">
    <rect>
     <x>0</x>
@@ -11,7 +11,7 @@
    </rect>
   </property>
   <property name="windowTitle">
-   <string>Dialog</string>
+   <string>Asymmetric Crypto</string>
   </property>
   <widget class="QWidget" name="verticalLayoutWidget">
    <property name="geometry">
@@ -48,10 +48,10 @@
     <item>
      <layout class="QHBoxLayout" name="horizontalLayout_2">
       <item>
-       <widget class="QLineEdit" name="lineEdit_3"/>
+       <widget class="QLineEdit" name="filename_plaintext"/>
       </item>
       <item>
-       <widget class="QPushButton" name="pushButton">
+       <widget class="QPushButton" name="browse_plaintext">
         <property name="text">
          <string>Browse</string>
         </property>
@@ -69,10 +69,10 @@
     <item>
      <layout class="QHBoxLayout" name="horizontalLayout_3">
       <item>
-       <widget class="QLineEdit" name="lineEdit_2"/>
+       <widget class="QLineEdit" name="filename_ciphertext"/>
       </item>
       <item>
-       <widget class="QPushButton" name="pushButton_2">
+       <widget class="QPushButton" name="browse_ciphertext">
         <property name="text">
          <string>Browse</string>
         </property>
@@ -81,25 +81,74 @@
      </layout>
     </item>
     <item>
-     <widget class="QLabel" name="label_3">
-      <property name="text">
-       <string>*.pub/*.pri File</string>
+     <layout class="QHBoxLayout" name="horizontalLayout_10">
+      <item>
+       <layout class="QVBoxLayout" name="verticalLayout_4">
+        <item>
+         <widget class="QLabel" name="label_4">
+          <property name="text">
+           <string>*.pri File</string>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <layout class="QHBoxLayout" name="horizontalLayout_18">
+          <item>
+           <widget class="QLineEdit" name="filename_privatekey"/>
+          </item>
+          <item>
+           <widget class="QPushButton" name="browse_privatekey">
+            <property name="text">
+             <string>Browse</string>
+            </property>
+           </widget>
+          </item>
+         </layout>
+        </item>
+       </layout>
+      </item>
+      <item>
+       <layout class="QVBoxLayout" name="verticalLayout_2">
+        <item>
+         <widget class="QLabel" name="label_3">
+          <property name="text">
+           <string>*.pub File</string>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <layout class="QHBoxLayout" name="horizontalLayout_12">
+          <item>
+           <widget class="QLineEdit" name="filename_publickey"/>
+          </item>
+          <item>
+           <widget class="QPushButton" name="browse_publickey">
+            <property name="text">
+             <string>Browse</string>
+            </property>
+           </widget>
+          </item>
+         </layout>
+        </item>
+       </layout>
+      </item>
+     </layout>
+    </item>
+    <item>
+     <spacer name="verticalSpacer_6">
+      <property name="orientation">
+       <enum>Qt::Vertical</enum>
       </property>
-     </widget>
-    </item>
-    <item>
-     <layout class="QHBoxLayout" name="horizontalLayout_4">
-      <item>
-       <widget class="QLineEdit" name="lineEdit"/>
-      </item>
-      <item>
-       <widget class="QPushButton" name="pushButton_3">
-        <property name="text">
-         <string>Browse</string>
-        </property>
-       </widget>
-      </item>
-     </layout>
+      <property name="sizeType">
+       <enum>QSizePolicy::Fixed</enum>
+      </property>
+      <property name="sizeHint" stdset="0">
+       <size>
+        <width>20</width>
+        <height>10</height>
+       </size>
+      </property>
+     </spacer>
     </item>
     <item>
      <layout class="QHBoxLayout" name="horizontalLayout_5">
@@ -113,19 +162,19 @@
          </widget>
         </item>
         <item>
-         <widget class="QTextEdit" name="textEdit_3"/>
+         <widget class="QTextEdit" name="ciphertext"/>
         </item>
         <item>
          <layout class="QHBoxLayout" name="horizontalLayout_14">
           <item>
-           <widget class="QPushButton" name="pushButton_8">
+           <widget class="QPushButton" name="rsa_decrypt">
             <property name="text">
              <string>Decrypt with RSA</string>
             </property>
            </widget>
           </item>
           <item>
-           <widget class="QPushButton" name="pushButton_9">
+           <widget class="QPushButton" name="elgamal_decrypt">
             <property name="text">
              <string>Decrypt with Elgamal</string>
             </property>
@@ -149,6 +198,22 @@
        </layout>
       </item>
       <item>
+       <spacer name="horizontalSpacer_4">
+        <property name="orientation">
+         <enum>Qt::Horizontal</enum>
+        </property>
+        <property name="sizeType">
+         <enum>QSizePolicy::Fixed</enum>
+        </property>
+        <property name="sizeHint" stdset="0">
+         <size>
+          <width>10</width>
+          <height>20</height>
+         </size>
+        </property>
+       </spacer>
+      </item>
+      <item>
        <layout class="QVBoxLayout" name="verticalLayout_3">
         <item>
          <widget class="QLabel" name="label_7">
@@ -158,19 +223,19 @@
          </widget>
         </item>
         <item>
-         <widget class="QTextEdit" name="textEdit_4"/>
+         <widget class="QTextEdit" name="plaintext"/>
         </item>
         <item>
          <layout class="QHBoxLayout" name="horizontalLayout_15">
           <item>
-           <widget class="QPushButton" name="pushButton_10">
+           <widget class="QPushButton" name="rsa_encrypt">
             <property name="text">
              <string>Encrypt with RSA</string>
             </property>
            </widget>
           </item>
           <item>
-           <widget class="QPushButton" name="pushButton_11">
+           <widget class="QPushButton" name="elgamal_encrypt">
             <property name="text">
              <string>Encrypt with Elgamal</string>
             </property>
@@ -194,6 +259,22 @@
        </layout>
       </item>
      </layout>
+    </item>
+    <item>
+     <spacer name="verticalSpacer_5">
+      <property name="orientation">
+       <enum>Qt::Vertical</enum>
+      </property>
+      <property name="sizeType">
+       <enum>QSizePolicy::Fixed</enum>
+      </property>
+      <property name="sizeHint" stdset="0">
+       <size>
+        <width>20</width>
+        <height>10</height>
+       </size>
+      </property>
+     </spacer>
     </item>
     <item>
      <layout class="QHBoxLayout" name="horizontalLayout_7">
@@ -223,7 +304,7 @@
          </widget>
         </item>
         <item>
-         <widget class="QLineEdit" name="lineEdit_4"/>
+         <widget class="QLineEdit" name="filename_key_2"/>
         </item>
         <item>
          <layout class="QHBoxLayout" name="horizontalLayout_8">
@@ -237,7 +318,7 @@
              </widget>
             </item>
             <item>
-             <widget class="QLineEdit" name="lineEdit_5"/>
+             <widget class="QLineEdit" name="rsa_p"/>
             </item>
             <item>
              <widget class="QLabel" name="label_15">
@@ -247,7 +328,7 @@
              </widget>
             </item>
             <item>
-             <widget class="QLineEdit" name="lineEdit_9"/>
+             <widget class="QLineEdit" name="rsa_g"/>
             </item>
             <item>
              <widget class="QLabel" name="label_16">
@@ -257,10 +338,10 @@
              </widget>
             </item>
             <item>
-             <widget class="QLineEdit" name="lineEdit_10"/>
+             <widget class="QLineEdit" name="rsa_e"/>
             </item>
             <item>
-             <widget class="QPushButton" name="pushButton_13">
+             <widget class="QPushButton" name="rsa_generate">
               <property name="text">
                <string>Generate RSA Key</string>
               </property>
@@ -273,9 +354,12 @@
             <property name="orientation">
              <enum>Qt::Horizontal</enum>
             </property>
+            <property name="sizeType">
+             <enum>QSizePolicy::Fixed</enum>
+            </property>
             <property name="sizeHint" stdset="0">
              <size>
-              <width>40</width>
+              <width>5</width>
               <height>20</height>
              </size>
             </property>
@@ -291,7 +375,7 @@
              </widget>
             </item>
             <item>
-             <widget class="QLineEdit" name="lineEdit_6"/>
+             <widget class="QLineEdit" name="elgamal_p"/>
             </item>
             <item>
              <widget class="QLabel" name="label_13">
@@ -301,7 +385,7 @@
              </widget>
             </item>
             <item>
-             <widget class="QLineEdit" name="lineEdit_7"/>
+             <widget class="QLineEdit" name="elgamal_g"/>
             </item>
             <item>
              <widget class="QLabel" name="label_14">
@@ -311,10 +395,10 @@
              </widget>
             </item>
             <item>
-             <widget class="QLineEdit" name="lineEdit_8"/>
+             <widget class="QLineEdit" name="elgamal_x"/>
             </item>
             <item>
-             <widget class="QPushButton" name="pushButton_12">
+             <widget class="QPushButton" name="elgamal_generate">
               <property name="text">
                <string>Generate Elgamal Key</string>
               </property>
@@ -338,6 +422,22 @@
          </spacer>
         </item>
        </layout>
+      </item>
+      <item>
+       <spacer name="horizontalSpacer_5">
+        <property name="orientation">
+         <enum>Qt::Horizontal</enum>
+        </property>
+        <property name="sizeType">
+         <enum>QSizePolicy::Fixed</enum>
+        </property>
+        <property name="sizeHint" stdset="0">
+         <size>
+          <width>10</width>
+          <height>20</height>
+         </size>
+        </property>
+       </spacer>
       </item>
       <item>
        <layout class="QVBoxLayout" name="verticalLayout_11">
@@ -372,7 +472,7 @@
              </widget>
             </item>
             <item>
-             <widget class="QLineEdit" name="lineEdit_11"/>
+             <widget class="QLineEdit" name="diffie_helman_x"/>
             </item>
             <item>
              <widget class="QLabel" name="label_19">
@@ -382,7 +482,7 @@
              </widget>
             </item>
             <item>
-             <widget class="QLineEdit" name="lineEdit_13"/>
+             <widget class="QLineEdit" name="diffie_helman_n"/>
             </item>
             <item>
              <widget class="QLabel" name="label_20">
@@ -392,10 +492,10 @@
              </widget>
             </item>
             <item>
-             <widget class="QLineEdit" name="lineEdit_14"/>
+             <widget class="QLineEdit" name="diffie_helman_g"/>
             </item>
             <item>
-             <widget class="QPushButton" name="pushButton_15">
+             <widget class="QPushButton" name="diffie_helman_generate_X">
               <property name="text">
                <string>Generate X</string>
               </property>
@@ -417,6 +517,22 @@
            </layout>
           </item>
           <item>
+           <spacer name="horizontalSpacer_6">
+            <property name="orientation">
+             <enum>Qt::Horizontal</enum>
+            </property>
+            <property name="sizeType">
+             <enum>QSizePolicy::Fixed</enum>
+            </property>
+            <property name="sizeHint" stdset="0">
+             <size>
+              <width>5</width>
+              <height>20</height>
+             </size>
+            </property>
+           </spacer>
+          </item>
+          <item>
            <layout class="QVBoxLayout" name="verticalLayout_17">
             <item>
              <widget class="QLabel" name="label_18">
@@ -426,11 +542,27 @@
              </widget>
             </item>
             <item>
-             <widget class="QTextEdit" name="textEdit_5"/>
+             <widget class="QTextEdit" name="diffie_helman_X"/>
             </item>
            </layout>
           </item>
          </layout>
+        </item>
+        <item>
+         <spacer name="verticalSpacer_4">
+          <property name="orientation">
+           <enum>Qt::Vertical</enum>
+          </property>
+          <property name="sizeType">
+           <enum>QSizePolicy::Fixed</enum>
+          </property>
+          <property name="sizeHint" stdset="0">
+           <size>
+            <width>20</width>
+            <height>5</height>
+           </size>
+          </property>
+         </spacer>
         </item>
         <item>
          <layout class="QHBoxLayout" name="horizontalLayout_11">
@@ -444,10 +576,10 @@
              </widget>
             </item>
             <item>
-             <widget class="QLineEdit" name="lineEdit_12"/>
+             <widget class="QLineEdit" name="diffie_helman_Y"/>
             </item>
             <item>
-             <widget class="QPushButton" name="pushButton_14">
+             <widget class="QPushButton" name="diffie_helman_generate_agreed_key">
               <property name="text">
                <string>Generate Agreed Key</string>
               </property>
@@ -469,6 +601,22 @@
            </layout>
           </item>
           <item>
+           <spacer name="horizontalSpacer_7">
+            <property name="orientation">
+             <enum>Qt::Horizontal</enum>
+            </property>
+            <property name="sizeType">
+             <enum>QSizePolicy::Fixed</enum>
+            </property>
+            <property name="sizeHint" stdset="0">
+             <size>
+              <width>5</width>
+              <height>20</height>
+             </size>
+            </property>
+           </spacer>
+          </item>
+          <item>
            <layout class="QVBoxLayout" name="verticalLayout_20">
             <item>
              <widget class="QLabel" name="label_22">
@@ -478,7 +626,7 @@
              </widget>
             </item>
             <item>
-             <widget class="QTextEdit" name="textEdit_6"/>
+             <widget class="QTextEdit" name="diffie_helman_agreed_key"/>
             </item>
            </layout>
           </item>
