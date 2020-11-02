@@ -353,16 +353,16 @@ class Ui_MainWindow(object):
         msg = QMessageBox()
         msg.setIcon(QMessageBox.Critical)
         msg.setText(message)
-        msg.setInformativeText('More information')
         msg.setWindowTitle("Error")
         msg.exec_()
 
-    def createTimeMsg(self, message):
+    def createTimeMsg(self, message, size):
         msg = QMessageBox()
         msg.setIcon(QMessageBox.Information)
-        msg.setText(message + " seconds")
-        msg.setInformativeText('More information')
-        msg.setWindowTitle("Time Elapsed")
+        msg.setText("elapsed time: " + message + " seconds")
+        if (size != ''):
+            msg.setInformativeText("   file size: " + size + "bytes")
+        msg.setWindowTitle("Information")
         msg.exec_()
 
     def browse(self, target):
@@ -417,7 +417,7 @@ class Ui_MainWindow(object):
                 encrypted = RSA.encrypt(array, pubKey["e"], pubKey["n"])
 
                 now = time.time()
-                self.createTimeMsg(str(now-then))
+                self.createTimeMsg(str(now-then), str(len(encrypted)))
 
                 # Set Path
                 path, _ = QtWidgets.QFileDialog.getSaveFileName(
@@ -435,7 +435,7 @@ class Ui_MainWindow(object):
                 # cText = encrypted.decode("ascii")
                 cipherText.setPlainText(cText)
                 now = time.time()
-                self.createTimeMsg(str(now-then))
+                self.createTimeMsg(str(now-then), '')
             else:
                 self.createErrorMsg("Plaintext Empty!")
                 return -1
@@ -456,7 +456,7 @@ class Ui_MainWindow(object):
                 decrypted = RSA.decrypt(array, priKey["d"], priKey["n"])
 
                 now = time.time()
-                self.createTimeMsg(str(now-then))
+                self.createTimeMsg(str(now-then), str(len(decrypted)))
 
                 # Set Path
                 path, _ = QtWidgets.QFileDialog.getSaveFileName(
@@ -474,7 +474,7 @@ class Ui_MainWindow(object):
                 # pText = decrypted.decode("ascii")
                 plainText.setPlainText(pText)
                 now = time.time()
-                self.createTimeMsg(str(now-then))
+                self.createTimeMsg(str(now-then), '')
             else:
                 self.createErrorMsg("Ciphertext Empty!")
                 return -1
@@ -497,9 +497,9 @@ class Ui_MainWindow(object):
                 el = Elgamal(pubKey["p"], pubKey["g"], (pubKey["p"] - 2))
                 el.setPublicKey(pubKey["y"], pubKey["g"], pubKey["p"])
                 encrypted = el.encrypt(array)
-                
+
                 now = time.time()
-                self.createTimeMsg(str(now-then))
+                self.createTimeMsg(str(now-then), str(len(encrypted)))
 
                 # Set Path
                 path, _ = QtWidgets.QFileDialog.getSaveFileName(
@@ -520,7 +520,7 @@ class Ui_MainWindow(object):
                 cipherText.setPlainText(cText)
 
                 now = time.time()
-                self.createTimeMsg(str(now-then))
+                self.createTimeMsg(str(now-then), '')
             else:
                 self.createErrorMsg("Plaintext Empty!")
                 return -1
@@ -543,7 +543,7 @@ class Ui_MainWindow(object):
                 decrypted = el.decrypt(array)
 
                 now = time.time()
-                self.createTimeMsg(str(now-then))
+                self.createTimeMsg(str(now-then), str(len(decrypted)))
 
                 # Set Path
                 path, _ = QtWidgets.QFileDialog.getSaveFileName(
@@ -564,7 +564,7 @@ class Ui_MainWindow(object):
                 plainText.setPlainText(pText)
 
                 now = time.time()
-                self.createTimeMsg(str(now-then))
+                self.createTimeMsg(str(now-then), '')
             else:
                 self.createErrorMsg("Plaintext Empty!")
                 return -1
@@ -586,7 +586,7 @@ class Ui_MainWindow(object):
             self.createErrorMsg("Target save filename is empty!")
             return -1
         now = time.time()
-        self.createTimeMsg(str(now-then))
+        self.createTimeMsg(str(now-then), '')
 
     def GenerateElgamal(self):
         then = time.time()
@@ -602,7 +602,7 @@ class Ui_MainWindow(object):
             self.createErrorMsg("Target save filename is empty!")
             return -1
         now = time.time()
-        self.createTimeMsg(str(now-then))
+        self.createTimeMsg(str(now-then), '')
 
     def DiffHellmanX(self):
         then = time.time()
@@ -624,7 +624,7 @@ class Ui_MainWindow(object):
             self.createErrorMsg("x empty!")
             return -1
         now = time.time()
-        self.createTimeMsg(str(now-then))
+        self.createTimeMsg(str(now-then), '')
 
     def DiffHellmanKey(self):
         then = time.time()
@@ -652,7 +652,7 @@ class Ui_MainWindow(object):
             self.createErrorMsg("x empty!")
             return -1
         now = time.time()
-        self.createTimeMsg(str(now-then))
+        self.createTimeMsg(str(now-then), '')
 
 if __name__ == "__main__":
     app = QtWidgets.QApplication(sys.argv)
